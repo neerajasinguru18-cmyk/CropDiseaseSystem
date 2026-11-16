@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Farmer Registration</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #e8f5e9, #a5d6a7);
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            background: white;
+            max-width: 450px;
+            margin: 30px auto;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px #00000025;
+        }
+
+        h2 {
+            text-align: center;
+            color: #14532d;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 9px 0 15px;
+            border: 1px solid #aaa;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        label {
+            color: #245b35;
+            font-weight: bold;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            background: #238636;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #14532d;
+        }
+
+        button:disabled {
+            background: #888;
+            cursor: not-allowed;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            color: #238636;
+        }
+
+        #message {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>🌱 Farmer Registration</h2>
+
+    <form id="registerForm">
+
+        <label>Farmer Name</label>
+        <input type="text" id="name"
+               placeholder="Enter your name" required>
+
+        <label>Mobile Number</label>
+        <input type="tel" id="mobile"
+               placeholder="Enter mobile number"
+               pattern="[0-9]{10}"
+               maxlength="10" required>
+
+        <label>Email Address</label>
+        <input type="email" id="email"
+               placeholder="Enter email" required>
+
+        <label>Village</label>
+        <input type="text" id="village"
+               placeholder="Enter village" required>
+
+        <label>District</label>
+        <input type="text" id="district"
+               placeholder="Enter district" required>
+
+        <label>Password</label>
+        <input type="password" id="password"
+               placeholder="Create password"
+               minlength="8" required>
+
+        <button type="submit" id="registerButton">
+            Register
+        </button>
+
+    </form>
+
+    <p id="message"></p>
+
+    <a href="/">Back to Home</a>
+
+</div>
+
+<script>
+
+document.getElementById("registerForm")
+.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const button = document.getElementById("registerButton");
+    const message = document.getElementById("message");
+
+    const farmer = {
+        name: document.getElementById("name").value.trim(),
+        mobile: document.getElementById("mobile").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        village: document.getElementById("village").value.trim(),
+        district: document.getElementById("district").value.trim(),
+        password: document.getElementById("password").value
+    };
+
+    button.disabled = true;
+    button.textContent = "Registering...";
+
+    message.textContent = "";
+
+    try {
+
+        const response = await fetch("/api/farmers/register", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(farmer)
+
+        });
+
+        const result = await response.text();
+
+        if (response.ok) {
+            message.style.color = "green";
+            message.textContent = result;
+
+            document.getElementById("registerForm").reset();
+        } else {
+            message.style.color = "red";
+            message.textContent = result;
+        }
+
+    } catch (error) {
+
+        message.style.color = "red";
+        message.textContent = "Unable to connect to backend!";
+
+        console.error(error);
+
+    } finally {
+
+        button.disabled = false;
+        button.textContent = "Register";
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>

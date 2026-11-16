@@ -1,0 +1,239 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Disease Detection</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f8f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        header {
+            background: #237a35;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .container {
+            max-width: 650px;
+            background: white;
+            margin: 30px auto;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px #ccc;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            border: 1px solid #aaa;
+            border-radius: 6px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background: #237a35;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #185c27;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 8px;
+            display: none;
+        }
+
+        a {
+            color: green;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>🔍 Crop Disease Detection</h1>
+    <p>Identify possible crop diseases from symptoms</p>
+</header>
+
+<div class="container">
+
+    <h2>Enter Crop Information</h2>
+
+    <form id="detectionForm">
+
+        <label>Select Crop</label>
+        <select id="crop" required>
+            <option value="">-- Select Crop --</option>
+            <option value="rice">Rice</option>
+            <option value="wheat">Wheat</option>
+            <option value="maize">Maize</option>
+            <option value="cotton">Cotton</option>
+            <option value="tomato">Tomato</option>
+        </select>
+
+        <label>Describe Symptoms</label>
+        <textarea id="symptoms" rows="5"
+            placeholder="Example: Brown spots on leaves, yellowing, wilting..."
+            required></textarea>
+
+        <button type="submit">Detect Possible Disease</button>
+
+    </form>
+
+    <div id="result"></div>
+
+    <p style="text-align:center; margin-top:25px;">
+        <a href="/dashboard.html">Back to Dashboard</a>
+    </p>
+
+</div>
+
+<script>
+
+const diseaseRules = {
+    rice: [
+        {
+            keywords: ["diamond", "spindle", "neck blast", "gray center"],
+            name: "Rice Blast",
+            advice: "Check affected leaves and panicles. Consult an agriculture officer for confirmation and suitable management."
+        },
+        {
+            keywords: ["yellow", "water soaked", "leaf blight"],
+            name: "Bacterial Leaf Blight",
+            advice: "Avoid excessive nitrogen fertilizer and maintain proper field drainage."
+        },
+        {
+            keywords: ["brown spots", "small brown", "oval spots"],
+            name: "Brown Spot",
+            advice: "Check soil nutrition and use healthy seeds. Seek local agricultural guidance."
+        }
+    ],
+
+    wheat: [
+        {
+            keywords: ["orange powder", "rust", "orange spots"],
+            name: "Wheat Rust",
+            advice: "Inspect leaves for rust pustules and consult an agricultural expert."
+        },
+        {
+            keywords: ["white powder", "powdery"],
+            name: "Powdery Mildew",
+            advice: "Monitor affected leaves and maintain proper crop spacing."
+        }
+    ],
+
+    maize: [
+        {
+            keywords: ["long lesions", "gray spots", "leaf blight"],
+            name: "Maize Leaf Blight",
+            advice: "Remove heavily affected plant debris and use recommended resistant varieties."
+        }
+    ],
+
+    cotton: [
+        {
+            keywords: ["curling", "curled leaves", "yellow veins"],
+            name: "Possible Cotton Leaf Curl Disease",
+            advice: "Inspect plants for whitefly insects and seek local agricultural advice."
+        }
+    ],
+
+    tomato: [
+        {
+            keywords: ["concentric rings", "target spots", "brown rings"],
+            name: "Early Blight",
+            advice: "Remove affected leaves and avoid overhead watering."
+        },
+        {
+            keywords: ["white powder", "powdery coating"],
+            name: "Powdery Mildew",
+            advice: "Improve air circulation and seek suitable local crop protection advice."
+        }
+    ]
+};
+
+document.getElementById("detectionForm")
+.addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+    const crop = document.getElementById("crop").value;
+    const symptoms = document.getElementById("symptoms")
+        .value.toLowerCase();
+
+    const result = document.getElementById("result");
+
+    const rules = diseaseRules[crop];
+
+    const matches = rules.filter(disease =>
+        disease.keywords.some(keyword =>
+            symptoms.includes(keyword)
+        )
+    );
+
+    result.style.display = "block";
+
+    if (matches.length > 0) {
+
+        result.innerHTML = "<h3>Possible Disease Found</h3>";
+
+        matches.forEach(disease => {
+            const heading = document.createElement("h4");
+            heading.textContent = disease.name;
+
+            const paragraph = document.createElement("p");
+            paragraph.textContent = disease.advice;
+
+            result.appendChild(heading);
+            result.appendChild(paragraph);
+        });
+
+    } else {
+
+        result.textContent =
+            "No matching disease was found from these keywords. Please provide more symptom details or consult an agricultural expert.";
+    }
+
+    const note = document.createElement("p");
+    note.textContent =
+        "Note: This is a basic keyword-based suggestion, not an AI diagnosis. Confirm the disease with an agricultural expert.";
+
+    result.appendChild(note);
+
+});
+
+</script>
+
+</body>
+</html>

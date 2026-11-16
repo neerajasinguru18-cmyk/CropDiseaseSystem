@@ -1,0 +1,116 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Crop Reports</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f8f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #237a35;
+        }
+
+        .report {
+            background: white;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 600px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #ccc;
+        }
+
+        .report h2 {
+            color: #237a35;
+        }
+
+        .message {
+            text-align: center;
+            font-size: 18px;
+        }
+
+        a {
+            color: green;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>📋 My Crop Reports</h1>
+
+    <p class="message" id="message">Loading reports...</p>
+
+    <div id="reports"></div>
+
+    <p style="text-align:center">
+        <a href="/dashboard.html">Back to Dashboard</a>
+    </p>
+
+    <script>
+        async function loadReports() {
+            const reportsDiv = document.getElementById("reports");
+            const message = document.getElementById("message");
+
+            try {
+                const response = await fetch("/api/reports/all");
+
+                if (!response.ok) {
+                    throw new Error("Unable to load reports");
+                }
+
+                const reports = await response.json();
+
+                reportsDiv.innerHTML = "";
+
+                if (reports.length === 0) {
+                    message.textContent = "No crop reports submitted yet.";
+                    return;
+                }
+
+                message.textContent = "Your submitted crop reports:";
+
+                reports.forEach(report => {
+                    const card = document.createElement("div");
+                    card.className = "report";
+
+                    const details = [
+                        ["Farmer Name", report.farmerName],
+                        ["Crop Name", report.cropName],
+                        ["Crop Type", report.cropType],
+                        ["Symptoms", report.symptoms],
+                        ["Village", report.village],
+                        ["District", report.district]
+                    ];
+
+                    const heading = document.createElement("h2");
+                    heading.textContent = "🌱 " + (report.cropName || "Crop Report");
+                    card.appendChild(heading);
+
+                    details.forEach(([label, value]) => {
+                        const p = document.createElement("p");
+                        p.textContent = label + ": " + (value || "");
+                        card.appendChild(p);
+                    });
+
+                    reportsDiv.appendChild(card);
+                });
+
+            } catch (error) {
+                message.textContent = "Error loading reports. Please try again.";
+            }
+        }
+
+        loadReports();
+    </script>
+
+</body>
+</html>

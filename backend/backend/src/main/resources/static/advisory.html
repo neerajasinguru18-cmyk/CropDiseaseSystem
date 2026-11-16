@@ -1,0 +1,222 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm Advisory</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f8f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        header {
+            background: #237a35;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .container {
+            max-width: 650px;
+            background: white;
+            margin: 30px auto;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px #ccc;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            border: 1px solid #aaa;
+            border-radius: 6px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background: #237a35;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #185c27;
+        }
+
+        #advice {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 8px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        a {
+            color: green;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>👨‍🌾 Farm Advisory</h1>
+    <p>Get useful farming suggestions for healthy crops</p>
+</header>
+
+<div class="container">
+
+    <h2>Get Farming Advice</h2>
+
+    <form id="advisoryForm">
+
+        <label>Select Crop</label>
+
+        <select id="crop" required>
+            <option value="">-- Select Crop --</option>
+            <option value="rice">Rice</option>
+            <option value="wheat">Wheat</option>
+            <option value="maize">Maize</option>
+            <option value="cotton">Cotton</option>
+            <option value="tomato">Tomato</option>
+        </select>
+
+        <label>Select Growth Stage</label>
+
+        <select id="stage" required>
+            <option value="">-- Select Stage --</option>
+            <option value="sowing">Sowing Stage</option>
+            <option value="vegetative">Vegetative Stage</option>
+            <option value="flowering">Flowering Stage</option>
+            <option value="harvesting">Harvesting Stage</option>
+        </select>
+
+        <button type="submit">Get Farm Advice</button>
+
+    </form>
+
+    <div id="advice"></div>
+
+    <p style="text-align:center; margin-top:25px;">
+        <a href="/dashboard.html">Back to Dashboard</a>
+    </p>
+
+</div>
+
+<script>
+
+const generalAdvice = {
+    sowing: [
+        "Use healthy, certified seeds suitable for your local area.",
+        "Prepare the field properly before sowing.",
+        "Maintain recommended spacing between plants.",
+        "Check soil conditions before planting."
+    ],
+
+    vegetative: [
+        "Monitor crop growth regularly.",
+        "Provide appropriate irrigation according to soil moisture.",
+        "Control weeds before they compete with crops.",
+        "Inspect leaves and stems for pest or disease symptoms."
+    ],
+
+    flowering: [
+        "Avoid water stress during flowering.",
+        "Monitor plants regularly for pests and diseases.",
+        "Avoid unnecessary disturbance to flowering plants.",
+        "Follow locally recommended nutrient management."
+    ],
+
+    harvesting: [
+        "Harvest when the crop reaches the recommended maturity stage.",
+        "Use clean harvesting equipment.",
+        "Dry harvested produce properly.",
+        "Store produce in a clean and dry place."
+    ]
+};
+
+const cropAdvice = {
+    rice: "Rice: Maintain suitable field water levels and monitor for blast and leaf blight.",
+    wheat: "Wheat: Monitor for rust and maintain suitable irrigation.",
+    maize: "Maize: Check for leaf damage and maintain proper field drainage.",
+    cotton: "Cotton: Inspect plants regularly for sucking pests and leaf curl symptoms.",
+    tomato: "Tomato: Use suitable plant support and monitor for leaf spots and wilting."
+};
+
+document.getElementById("advisoryForm")
+.addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+    const crop = document.getElementById("crop").value;
+    const stage = document.getElementById("stage").value;
+
+    const adviceDiv = document.getElementById("advice");
+
+    adviceDiv.innerHTML = "";
+
+    const heading = document.createElement("h3");
+    heading.textContent = "🌱 Your Farm Advisory";
+
+    adviceDiv.appendChild(heading);
+
+    const cropInfo = document.createElement("p");
+    cropInfo.textContent = cropAdvice[crop];
+
+    adviceDiv.appendChild(cropInfo);
+
+    const stageHeading = document.createElement("h4");
+    stageHeading.textContent = "Suggestions for this growth stage:";
+
+    adviceDiv.appendChild(stageHeading);
+
+    const list = document.createElement("ul");
+
+    generalAdvice[stage].forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        list.appendChild(li);
+    });
+
+    adviceDiv.appendChild(list);
+
+    const note = document.createElement("p");
+    note.textContent =
+        "Note: These are general suggestions. Follow local agricultural recommendations for irrigation, fertilizers and crop protection.";
+
+    adviceDiv.appendChild(note);
+
+    adviceDiv.style.display = "block";
+
+});
+
+</script>
+
+</body>
+</html>

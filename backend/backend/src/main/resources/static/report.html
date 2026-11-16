@@ -1,0 +1,208 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Disease Reporting</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f8f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #ccc;
+        }
+
+        h2 {
+            text-align: center;
+            color: #237a35;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 11px;
+            margin-top: 7px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 22px;
+            background: #238b38;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            background: gray;
+        }
+
+        #message {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #237a35;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Crop Disease Reporting</h2>
+
+    <form id="reportForm">
+
+        <label>Farmer Name</label>
+        <input type="text" id="farmerName" value="Farmer" required>
+
+        <label>Crop Name</label>
+        <input type="text" id="cropName"
+               placeholder="Enter crop name" required>
+
+        <label>Crop Type</label>
+        <select id="cropType" required>
+            <option value="">Select Crop Type</option>
+            <option value="Food Crop">Food Crop</option>
+            <option value="Cash Crop">Cash Crop</option>
+            <option value="Vegetable">Vegetable</option>
+            <option value="Fruit">Fruit</option>
+            <option value="Other">Other</option>
+        </select>
+
+        <label>Symptoms</label>
+        <textarea id="symptoms"
+                  placeholder="Describe crop disease symptoms"
+                  required></textarea>
+
+        <label>Village</label>
+        <input type="text" id="village" required>
+
+        <label>District</label>
+        <input type="text" id="district" required>
+
+        <label>Upload Crop Image</label>
+        <input type="file" id="cropImage"
+               accept="image/*" required>
+
+        <button type="submit">Submit Report</button>
+
+    </form>
+
+    <p id="message"></p>
+
+    <a class="back" href="/dashboard.html">
+        Back to Dashboard
+    </a>
+
+</div>
+
+<script>
+document.getElementById("reportForm")
+    .addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+        const button = this.querySelector("button");
+        const message = document.getElementById("message");
+        const image = document.getElementById("cropImage").files[0];
+
+        if (!image) {
+            alert("Please upload a crop image!");
+            return;
+        }
+
+        const formData = new FormData();
+
+        formData.append("farmerName",
+            document.getElementById("farmerName").value);
+
+        formData.append("cropName",
+            document.getElementById("cropName").value);
+
+        formData.append("cropType",
+            document.getElementById("cropType").value);
+
+        formData.append("symptoms",
+            document.getElementById("symptoms").value);
+
+        formData.append("village",
+            document.getElementById("village").value);
+
+        formData.append("district",
+            document.getElementById("district").value);
+
+        formData.append("image", image);
+
+        button.disabled = true;
+        button.textContent = "Submitting...";
+        message.style.color = "blue";
+        message.textContent = "Submitting your report...";
+
+        try {
+            const response = await fetch("/api/reports/submit", {
+                method: "POST",
+                body: formData
+            });
+
+            const result = await response.text();
+
+            if (response.ok) {
+                message.style.color = "green";
+                message.textContent = result;
+                document.getElementById("reportForm").reset();
+            } else {
+                message.style.color = "red";
+                message.textContent = result;
+            }
+
+        } catch (error) {
+            message.style.color = "red";
+            message.textContent =
+                "Unable to connect to the backend!";
+        } finally {
+            button.disabled = false;
+            button.textContent = "Submit Report";
+        }
+    });
+</script>
+
+</body>
+</html>

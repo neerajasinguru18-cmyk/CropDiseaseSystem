@@ -1,0 +1,304 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Crop Disease Reporting & Farm Advisory System</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #e8f5e9, #b9e4c9);
+            min-height: 100vh;
+            color: #174d2b;
+        }
+
+        header {
+            background: #14532d;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        nav {
+            background: #267a40;
+            padding: 18px;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 12px;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            color: #d9f99d;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 70px 20px;
+        }
+
+        .hero h1 {
+            font-size: 36px;
+            color: #14532d;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 19px;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            display: inline-block;
+            background: #238636;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin: 10px;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            background: #14532d;
+        }
+
+        /* Registration and Login Buttons */
+        .main-buttons {
+            margin-top: 30px;
+        }
+
+        .register-btn,
+        .login-btn {
+            display: inline-block;
+            color: white;
+            padding: 18px 30px;
+            margin: 10px;
+            border: 2px solid white;
+            border-radius: 10px;
+            font-size: 19px;
+            font-weight: bold;
+            text-decoration: none;
+            box-shadow: 0 4px 12px #00000030;
+            transition: 0.3s;
+        }
+
+        .register-btn {
+            background: #14532d;
+        }
+
+        .register-btn:hover {
+            background: #267a40;
+            transform: scale(1.05);
+        }
+
+        .login-btn {
+            background: #1d4ed8;
+        }
+
+        .login-btn:hover {
+            background: #1e40af;
+            transform: scale(1.05);
+        }
+
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            padding: 30px 20px;
+        }
+
+        .card {
+            background: white;
+            width: 280px;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 12px #00000020;
+        }
+
+        .card h3 {
+            color: #238636;
+            margin-bottom: 15px;
+        }
+
+        .card p {
+            line-height: 1.6;
+        }
+
+        .about {
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        .about h2 {
+            margin-bottom: 18px;
+            color: #14532d;
+        }
+
+        .about p {
+            max-width: 750px;
+            margin: auto;
+            line-height: 1.8;
+        }
+
+        footer {
+            background: #14532d;
+            color: white;
+            text-align: center;
+            padding: 22px;
+            margin-top: 30px;
+            line-height: 1.8;
+        }
+
+        @media(max-width: 600px) {
+            .hero h1 {
+                font-size: 27px;
+            }
+
+            nav a {
+                display: inline-block;
+                margin: 8px;
+            }
+
+            .card {
+                width: 100%;
+            }
+
+            .register-btn,
+            .login-btn {
+                display: block;
+                max-width: 300px;
+                margin: 12px auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h2>🌱 Crop Disease Reporting & Farm Advisory System</h2>
+    </header>
+
+    <nav>
+        <a href="/">Home</a>
+        <a href="#features">Features</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+        <a href="/register.html">Register</a>
+        <a href="/login.html">Farmer Login</a>
+    </nav>
+
+    <section class="hero">
+
+        <h1>
+            Welcome to Crop Disease Reporting and Farm Advisory System!
+        </h1>
+
+        <p>
+            Healthy Crops... Prosperous Farmers...
+            A Greener Tomorrow!
+        </p>
+
+        <a href="#features" class="btn">
+            Explore Features
+        </a>
+
+        <a href="#about" class="btn">
+            Learn More
+        </a>
+
+        <div class="main-buttons">
+
+            <a href="/register.html" class="register-btn">
+                👨‍🌾 Farmer Registration
+            </a>
+
+            <a href="/login.html" class="login-btn">
+                🔐 Farmer Login
+            </a>
+
+        </div>
+
+    </section>
+
+    <section class="features" id="features">
+
+        <div class="card">
+            <h3>🌿 Disease Reporting</h3>
+            <p>
+                Report crop diseases and upload affected plant images.
+                Share information about damaged crops.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>🔍 Disease Detection</h3>
+            <p>
+                Identify possible crop diseases and understand
+                their symptoms and causes.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>👨‍🌾 Farm Advisory</h3>
+            <p>
+                Get useful farming suggestions, crop protection
+                advice and agricultural information.
+            </p>
+        </div>
+
+    </section>
+
+    <section class="about" id="about">
+
+        <h2>About Our System</h2>
+
+        <p>
+            The Crop Disease Reporting and Farm Advisory System
+            helps farmers report crop diseases, understand plant
+            health problems and receive useful farming guidance.
+            Our goal is to support farmers, protect crops and
+            improve agricultural productivity using technology.
+        </p>
+
+        <a href="/register.html" class="btn">
+            Register as a Farmer
+        </a>
+
+        <a href="/login.html" class="btn">
+            Farmer Login
+        </a>
+
+    </section>
+
+    <footer id="contact">
+
+        <p>
+            © 2026 Crop Disease Reporting and Farm Advisory System
+        </p>
+
+        <p>
+            Supporting Farmers | Protecting Crops | Growing Better
+        </p>
+
+    </footer>
+
+</body>
+</html>

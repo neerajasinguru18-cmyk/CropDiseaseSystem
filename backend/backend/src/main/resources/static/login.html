@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Farmer Login</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #e8f5e9, #a5d6a7);
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            background: white;
+            max-width: 400px;
+            margin: 60px auto;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px #00000025;
+        }
+
+        h2 {
+            text-align: center;
+            color: #14532d;
+        }
+
+        label {
+            color: #245b35;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0 18px;
+            border: 1px solid #aaa;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            background: #238636;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #14532d;
+        }
+
+        button:disabled {
+            background: #888;
+            cursor: not-allowed;
+        }
+
+        #message {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            color: #238636;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h2>🌱 Farmer Login</h2>
+
+        <form id="loginForm">
+
+            <label>Email Address</label>
+            <input type="email"
+                   id="email"
+                   placeholder="Enter registered email"
+                   required>
+
+            <label>Password</label>
+            <input type="password"
+                   id="password"
+                   placeholder="Enter password"
+                   required>
+
+            <button type="submit" id="loginButton">
+                Login
+            </button>
+
+        </form>
+
+        <p id="message"></p>
+
+        <a href="/register.html">New Farmer? Register Here</a>
+
+        <a href="/">Back to Home</a>
+
+    </div>
+
+    <script>
+
+        document.getElementById("loginForm")
+        .addEventListener("submit", async function(event) {
+
+            event.preventDefault();
+
+            const button = document.getElementById("loginButton");
+            const message = document.getElementById("message");
+
+            const farmer = {
+                email: document.getElementById("email").value.trim(),
+                password: document.getElementById("password").value
+            };
+
+            button.disabled = true;
+            button.textContent = "Logging in...";
+
+            message.textContent = "";
+
+            try {
+
+                const response = await fetch("/api/farmers/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(farmer)
+                });
+
+                const result = await response.text();
+
+                if (response.ok) {
+
+                    message.style.color = "green";
+                    message.textContent =
+                        "Login successful! Opening dashboard...";
+
+                    alert("Login successful! Redirecting to Dashboard...");
+
+                    // Open dashboard after successful login
+                    window.location.href =
+                        "http://localhost:8082/dashboard.html";
+
+                } else {
+
+                    message.style.color = "red";
+                    message.textContent = result;
+
+                    button.disabled = false;
+                    button.textContent = "Login";
+
+                }
+
+            } catch (error) {
+
+                message.style.color = "red";
+                message.textContent =
+                    "Unable to connect to backend!";
+
+                button.disabled = false;
+                button.textContent = "Login";
+
+            }
+
+        });
+
+    </script>
+
+</body>
+</html>
