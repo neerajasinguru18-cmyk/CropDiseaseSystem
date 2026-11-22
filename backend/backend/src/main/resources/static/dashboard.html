@@ -39,6 +39,10 @@
             font-weight: bold;
         }
 
+        nav a:hover {
+            text-decoration: underline;
+        }
+
         .welcome {
             text-align: center;
             padding: 40px 20px;
@@ -117,7 +121,7 @@
     <nav>
         <a href="/">Home</a>
         <a href="/dashboard.html">Dashboard</a>
-        <a href="/login.html">Login</a>
+        <a href="#" onclick="logout(); return false;">Logout</a>
     </nav>
 
     <section class="welcome">
@@ -128,42 +132,44 @@
     <section class="dashboard">
 
         <a href="/report.html" class="card">
-            <h2>🌿 Disease Reporting</h2>
-            <p>
-                Click here to report crop diseases and provide
-                information about affected plants.
-            </p>
-        </a>
-
-        <a href="/detection.html" class="card">
-            <h2>🔍 Disease Detection</h2>
-            <p>
-                Identify possible crop diseases and learn
-                about their symptoms.
-            </p>
+            <h2>🌿 Crop Disease Report</h2>
+            <p>Upload your crop image, submit a report and get AI-powered disease detection results.</p>
         </a>
 
         <a href="/advisory.html" class="card">
             <h2>👨‍🌾 Farm Advisory</h2>
-            <p>
-                Get farming suggestions and crop protection
-                information.
-            </p>
+            <p>Get farming suggestions and crop protection information.</p>
         </a>
 
         <a href="/my-reports.html" class="card">
             <h2>📋 My Reports</h2>
-            <p>
-                View and manage your submitted crop disease
-                reports.
-            </p>
+            <p>View your previously submitted crop disease reports.</p>
+        </a>
+
+        <a href="/weather.html" class="card">
+            <h2>🌦️ Weather & Farming Alerts</h2>
+            <p>Check live weather, temperature, humidity, rainfall, wind and weather-based farming alerts.</p>
         </a>
 
     </section>
 
     <footer>
-        <p>© 2026 Crop Disease Reporting & Farm Advisory System</p>
+        <p>Crop Disease Reporting & Farm Advisory System</p>
     </footer>
+
+    <script>
+        function logout() {
+            fetch("/api/farmers/logout", {
+                method: "POST"
+            })
+            .then(() => {
+                window.location.href = "/login.html";
+            })
+            .catch(() => {
+                window.location.href = "/login.html";
+            });
+        }
+    </script>
 
 </body>
 </html>

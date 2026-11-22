@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.servlet.http.HttpSession;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,12 +43,39 @@ public class ReportController {
             @RequestParam("symptoms") String symptoms,
             @RequestParam("village") String village,
             @RequestParam("district") String district,
-            @RequestParam("image") MultipartFile image) {
+            @RequestParam("image") MultipartFile image,
+
+            @RequestParam(value = "detectedDisease",
+                    required = false,
+                    defaultValue = "Detection pending")
+            String detectedDisease,
+
+            @RequestParam(value = "confidence",
+                    required = false,
+                    defaultValue = "0")
+            double confidence,
+
+            HttpSession session) {
 
         try {
 
-            if (farmerName.isBlank() ||
-                cropName.isBlank() ||
+            // Verify farmer login session
+
+            String loggedInEmail =
+                    (String) session.getAttribute("farmerEmail");
+
+            String loggedInName =
+                    (String) session.getAttribute("farmerName");
+
+            if (loggedInEmail == null || loggedInName == null) {
+
+                return ResponseEntity.status(401)
+                        .body("Please login before submitting a report!");
+            }
+
+            // Validate farmer information
+
+            if (cropName.isBlank() ||
                 cropType.isBlank() ||
                 symptoms.isBlank() ||
                 village.isBlank() ||
@@ -56,12 +85,16 @@ public class ReportController {
                         .body("Please fill all fields!");
             }
 
+            // Validate image
+
             if (image == null || image.isEmpty()) {
+
                 return ResponseEntity.badRequest()
                         .body("Please upload a crop image!");
             }
 
             if (image.getSize() > 5 * 1024 * 1024) {
+
                 return ResponseEntity.badRequest()
                         .body("Image size must be below 5 MB!");
             }
@@ -92,6 +125,8 @@ public class ReportController {
                         .body("Only JPG, JPEG, PNG and WEBP images are allowed!");
             }
 
+            // Save uploaded image
+
             Files.createDirectories(uploadFolder);
 
             String imageName = UUID.randomUUID() + extension;
@@ -99,6 +134,8 @@ public class ReportController {
             Path imagePath = uploadFolder.resolve(imageName);
 
             image.transferTo(imagePath.toFile());
+
+            // Read existing reports
 
             List<CropReport> reports = new ArrayList<>();
 
@@ -111,17 +148,31 @@ public class ReportController {
                 );
             }
 
+            // Create report using logged-in farmer identity
+
             CropReport report = new CropReport(
-                    farmerName,
+                    loggedInName,
+                    loggedInEmail.toLowerCase(Locale.ROOT),
                     cropName,
                     cropType,
                     symptoms,
                     village,
                     district,
-                    imageName
+                    imageName,
+                    detectedDisease
             );
 
             reports.add(report);
+
+            // Create data directory if required
+
+            File parent = reportFile.getParentFile();
+
+            if (parent != null && !parent.exists()) {
+                parent.mkdirs();
+            }
+
+            // Save report
 
             mapper.writerWithDefaultPrettyPrinter()
                     .writeValue(reportFile, reports);
@@ -140,12 +191,23 @@ public class ReportController {
     }
 
 
-    // API 2: Get All Submitted Reports
+    // API 2: Get Reports of Logged-In Farmer Only
 
     @GetMapping("/all")
-    public ResponseEntity<?> getAllReports() {
+    public ResponseEntity<?> getAllReports(HttpSession session) {
 
         try {
+
+            // Verify login session
+
+            String loggedInEmail =
+                    (String) session.getAttribute("farmerEmail");
+
+            if (loggedInEmail == null) {
+
+                return ResponseEntity.status(401)
+                        .body("Please login to view your reports!");
+            }
 
             if (!reportFile.exists() ||
                 reportFile.length() == 0) {
@@ -160,7 +222,21 @@ public class ReportController {
                     new TypeReference<List<CropReport>>() {}
             );
 
-            return ResponseEntity.ok(reports);
+            // Filter reports using logged-in farmer email
+
+            List<CropReport> farmerReports = new ArrayList<>();
+
+            for (CropReport report : reports) {
+
+                if (report.getFarmerEmail() != null &&
+                    report.getFarmerEmail().equalsIgnoreCase(
+                            loggedInEmail.trim())) {
+
+                    farmerReports.add(report);
+                }
+            }
+
+            return ResponseEntity.ok(farmerReports);
 
         } catch (Exception e) {
 

@@ -41,7 +41,7 @@
             font-weight: bold;
         }
 
-        select, textarea {
+        select, textarea, input[type="file"] {
             width: 100%;
             padding: 12px;
             margin-top: 8px;
@@ -65,10 +65,23 @@
             background: #185c27;
         }
 
+        button:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
         #result {
             margin-top: 20px;
             padding: 15px;
             background: #e8f5e9;
+            border-radius: 8px;
+            display: none;
+        }
+
+        #preview {
+            max-width: 100%;
+            max-height: 300px;
+            margin-top: 15px;
             border-radius: 8px;
             display: none;
         }
@@ -83,12 +96,12 @@
 
 <header>
     <h1>🔍 Crop Disease Detection</h1>
-    <p>Identify possible crop diseases from symptoms</p>
+    <p>Upload a crop leaf image to identify possible diseases using AI</p>
 </header>
 
 <div class="container">
 
-    <h2>Enter Crop Information</h2>
+    <h2>Detect Crop Disease</h2>
 
     <form id="detectionForm">
 
@@ -100,14 +113,22 @@
             <option value="maize">Maize</option>
             <option value="cotton">Cotton</option>
             <option value="tomato">Tomato</option>
+            <option value="grape">Grape</option>
+            <option value="potato">Potato</option>
+            <option value="apple">Apple</option>
+            <option value="other">Other</option>
         </select>
 
-        <label>Describe Symptoms</label>
-        <textarea id="symptoms" rows="5"
-            placeholder="Example: Brown spots on leaves, yellowing, wilting..."
-            required></textarea>
+        <label>Upload Leaf Image</label>
+        <input type="file" id="leafImage" accept="image/*" required>
 
-        <button type="submit">Detect Possible Disease</button>
+        <img id="preview" alt="Leaf image preview">
+
+        <label>Describe Symptoms (Optional)</label>
+        <textarea id="symptoms" rows="4"
+            placeholder="Example: Brown spots, yellow leaves, wilting..."></textarea>
+
+        <button type="submit" id="detectBtn">Detect Disease using AI</button>
 
     </form>
 
@@ -121,115 +142,97 @@
 
 <script>
 
-const diseaseRules = {
-    rice: [
-        {
-            keywords: ["diamond", "spindle", "neck blast", "gray center"],
-            name: "Rice Blast",
-            advice: "Check affected leaves and panicles. Consult an agriculture officer for confirmation and suitable management."
-        },
-        {
-            keywords: ["yellow", "water soaked", "leaf blight"],
-            name: "Bacterial Leaf Blight",
-            advice: "Avoid excessive nitrogen fertilizer and maintain proper field drainage."
-        },
-        {
-            keywords: ["brown spots", "small brown", "oval spots"],
-            name: "Brown Spot",
-            advice: "Check soil nutrition and use healthy seeds. Seek local agricultural guidance."
-        }
-    ],
+const form = document.getElementById("detectionForm");
+const imageInput = document.getElementById("leafImage");
+const result = document.getElementById("result");
+const preview = document.getElementById("preview");
+const detectBtn = document.getElementById("detectBtn");
 
-    wheat: [
-        {
-            keywords: ["orange powder", "rust", "orange spots"],
-            name: "Wheat Rust",
-            advice: "Inspect leaves for rust pustules and consult an agricultural expert."
-        },
-        {
-            keywords: ["white powder", "powdery"],
-            name: "Powdery Mildew",
-            advice: "Monitor affected leaves and maintain proper crop spacing."
-        }
-    ],
+// Show uploaded image preview
+imageInput.addEventListener("change", function () {
 
-    maize: [
-        {
-            keywords: ["long lesions", "gray spots", "leaf blight"],
-            name: "Maize Leaf Blight",
-            advice: "Remove heavily affected plant debris and use recommended resistant varieties."
-        }
-    ],
+    const file = this.files[0];
 
-    cotton: [
-        {
-            keywords: ["curling", "curled leaves", "yellow veins"],
-            name: "Possible Cotton Leaf Curl Disease",
-            advice: "Inspect plants for whitefly insects and seek local agricultural advice."
-        }
-    ],
+    if (file) {
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = "block";
+        result.style.display = "none";
+    }
+});
 
-    tomato: [
-        {
-            keywords: ["concentric rings", "target spots", "brown rings"],
-            name: "Early Blight",
-            advice: "Remove affected leaves and avoid overhead watering."
-        },
-        {
-            keywords: ["white powder", "powdery coating"],
-            name: "Powdery Mildew",
-            advice: "Improve air circulation and seek suitable local crop protection advice."
-        }
-    ]
-};
-
-document.getElementById("detectionForm")
-.addEventListener("submit", function(event) {
+// Send image to AI backend
+form.addEventListener("submit", async function (event) {
 
     event.preventDefault();
 
-    const crop = document.getElementById("crop").value;
-    const symptoms = document.getElementById("symptoms")
-        .value.toLowerCase();
+    const file = imageInput.files[0];
 
-    const result = document.getElementById("result");
-
-    const rules = diseaseRules[crop];
-
-    const matches = rules.filter(disease =>
-        disease.keywords.some(keyword =>
-            symptoms.includes(keyword)
-        )
-    );
-
-    result.style.display = "block";
-
-    if (matches.length > 0) {
-
-        result.innerHTML = "<h3>Possible Disease Found</h3>";
-
-        matches.forEach(disease => {
-            const heading = document.createElement("h4");
-            heading.textContent = disease.name;
-
-            const paragraph = document.createElement("p");
-            paragraph.textContent = disease.advice;
-
-            result.appendChild(heading);
-            result.appendChild(paragraph);
-        });
-
-    } else {
-
-        result.textContent =
-            "No matching disease was found from these keywords. Please provide more symptom details or consult an agricultural expert.";
+    if (!file) {
+        alert("Please upload a leaf image.");
+        return;
     }
 
-    const note = document.createElement("p");
-    note.textContent =
-        "Note: This is a basic keyword-based suggestion, not an AI diagnosis. Confirm the disease with an agricultural expert.";
+    detectBtn.disabled = true;
+    detectBtn.textContent = "AI is analyzing the image...";
+    result.style.display = "block";
+    result.innerHTML = "<p>🌿 Analyzing leaf image. Please wait...</p>";
 
-    result.appendChild(note);
+    try {
+
+        const formData = new FormData();
+        formData.append("image", file);
+
+        const response = await fetch(
+            "http://localhost:8084/api/detection/predict",
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                typeof data === "string"
+                    ? data
+                    : "AI prediction failed."
+            );
+        }
+
+        const diseaseName = data.disease
+            .replaceAll("___", " - ")
+            .replaceAll("_", " ");
+
+        const confidence = Number(data.confidence);
+
+        result.innerHTML = `
+            <h3>🌱 AI Prediction Result</h3>
+            <p><strong>Selected Crop:</strong> ${document.getElementById("crop").value}</p>
+            <p><strong>Predicted Disease:</strong> ${diseaseName}</p>
+            <p><strong>Confidence Score:</strong> ${confidence.toFixed(2)}%</p>
+            <p>
+                <strong>Symptoms Provided:</strong>
+                ${document.getElementById("symptoms").value || "None"}
+            </p>
+            <hr>
+            <p>⚠️ AI prediction is only an estimate. Please confirm with an agricultural expert.</p>
+        `;
+
+    } catch (error) {
+
+        result.innerHTML = `
+            <h3>❌ Prediction Failed</h3>
+            <p>${error.message}</p>
+            <p>Make sure the AI backend is running on port 8084.</p>
+        `;
+
+    } finally {
+
+        detectBtn.disabled = false;
+        detectBtn.textContent = "Detect Disease using AI";
+
+    }
 
 });
 

@@ -3,3 +3,14 @@
 .env
 data/
 uploads/
+# IDE files
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Maven wrapper temporary files
+.mvn/wrapper/maven-wrapper.jar
+

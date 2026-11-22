@@ -32,6 +32,14 @@
             color: #237a35;
         }
 
+        .disease {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 6px;
+            color: #237a35;
+            font-weight: bold;
+        }
+
         .message {
             text-align: center;
             font-size: 18px;
@@ -100,6 +108,15 @@
                         p.textContent = label + ": " + (value || "");
                         card.appendChild(p);
                     });
+
+                    // AI Detected Disease
+                    const disease = document.createElement("p");
+                    disease.className = "disease";
+                    disease.textContent =
+                        "🦠 AI Detected Disease: " +
+                        (report.detectedDisease || "Not detected");
+
+                    card.appendChild(disease);
 
                     reportsDiv.appendChild(card);
                 });

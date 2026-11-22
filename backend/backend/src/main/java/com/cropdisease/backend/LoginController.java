@@ -8,6 +8,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import jakarta.servlet.http.HttpSession;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +29,11 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(
-            @RequestBody Farmer farmer) {
+            @RequestBody Farmer farmer,
+            HttpSession session) {
 
         try {
+
             if (farmer.getEmail() == null ||
                 farmer.getPassword() == null) {
 
@@ -40,9 +44,10 @@ public class LoginController {
             List<Farmer> farmers = new ArrayList<>();
 
             if (file.exists()) {
+
                 farmers = mapper.readValue(
-                    file,
-                    new TypeReference<List<Farmer>>() {}
+                        file,
+                        new TypeReference<List<Farmer>>() {}
                 );
             }
 
@@ -56,9 +61,20 @@ public class LoginController {
                             farmer.getPassword(),
                             existing.getPassword())) {
 
+                        // Store logged-in farmer identity
+                        session.setAttribute(
+                                "farmerEmail",
+                                existing.getEmail().trim().toLowerCase()
+                        );
+
+                        session.setAttribute(
+                                "farmerName",
+                                existing.getName()
+                        );
+
                         return ResponseEntity.ok(
-                            "Login successful! Welcome, "
-                            + existing.getName()
+                                "Login successful! Welcome, "
+                                + existing.getName()
                         );
                     }
 
@@ -71,10 +87,36 @@ public class LoginController {
                     .body("Farmer account not found!");
 
         } catch (Exception e) {
+
             e.printStackTrace();
 
             return ResponseEntity.internalServerError()
                     .body("Login failed! Please try again.");
         }
+    }
+
+    // Check currently logged-in farmer
+    @GetMapping("/current")
+    public ResponseEntity<?> getCurrentFarmer(
+            HttpSession session) {
+
+        String email = (String) session.getAttribute("farmerEmail");
+
+        if (email == null) {
+            return ResponseEntity.status(401)
+                    .body("Please login first!");
+        }
+
+        return ResponseEntity.ok(email);
+    }
+
+    // Logout
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(
+            HttpSession session) {
+
+        session.invalidate();
+
+        return ResponseEntity.ok("Logged out successfully!");
     }
 }

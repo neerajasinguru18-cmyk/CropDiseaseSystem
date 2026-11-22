@@ -1,0 +1,650 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather & Farming Alerts</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f0f8f0;
+    margin: 0;
+    color: #234b2b;
+}
+
+header {
+    background: #14532d;
+    color: white;
+    text-align: center;
+    padding: 25px;
+}
+
+header h1 {
+    margin: 0;
+}
+
+nav {
+    background: #237a35;
+    padding: 15px;
+    text-align: center;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 25px;
+}
+
+.search-box {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+}
+
+input {
+    padding: 12px;
+    width: 280px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+button {
+    padding: 12px 18px;
+    border: none;
+    background: #237a35;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #14532d;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.location {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    margin: 20px 0;
+}
+
+.current-weather {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 3px 10px #ccc;
+}
+
+.current-weather h2 {
+    color: #237a35;
+}
+
+.weather-icon {
+    font-size: 65px;
+}
+
+.temperature {
+    font-size: 55px;
+    font-weight: bold;
+    color: #237a35;
+}
+
+.weather-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.weather-card {
+    background: white;
+    padding: 20px;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px #ccc;
+}
+
+.weather-card h3 {
+    color: #237a35;
+}
+
+.weather-card p {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.section-title {
+    text-align: center;
+    color: #237a35;
+    margin-top: 35px;
+}
+
+.forecast-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    gap: 12px;
+}
+
+.forecast-card {
+    background: white;
+    border-radius: 10px;
+    text-align: center;
+    padding: 18px 10px;
+    box-shadow: 0 2px 6px #ccc;
+}
+
+.forecast-icon {
+    font-size: 35px;
+}
+
+.alert-box {
+    background: white;
+    padding: 18px;
+    margin: 12px 0;
+    border-radius: 10px;
+    border-left: 6px solid #237a35;
+    box-shadow: 0 2px 6px #ddd;
+}
+
+.alert-box.warning {
+    border-left-color: #f0a000;
+}
+
+.alert-box.danger {
+    border-left-color: #d32f2f;
+}
+
+.alert-box.info {
+    border-left-color: #2196f3;
+}
+
+.alert-box h3 {
+    margin-top: 0;
+}
+
+.status {
+    text-align: center;
+    padding: 15px;
+    color: #555;
+}
+
+footer {
+    background: #14532d;
+    color: white;
+    text-align: center;
+    padding: 18px;
+    margin-top: 35px;
+}
+
+@media(max-width:600px) {
+    .container {
+        padding: 15px;
+    }
+
+    .temperature {
+        font-size: 42px;
+    }
+
+    input {
+        width: 100%;
+    }
+
+    nav a {
+        margin: 0 8px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🌦️ Weather & Farming Alerts</h1>
+    <p>Crop Disease Reporting & Farm Advisory System</p>
+</header>
+
+<nav>
+    <a href="index.html">Home</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="report.html">Crop Report</a>
+</nav>
+
+<div class="container">
+
+    <div class="search-box">
+        <input type="text" id="cityInput"
+               placeholder="Enter village, town or city">
+
+        <button onclick="searchWeather()">🔍 Search</button>
+
+        <button onclick="getMyLocation()">📍 My Location</button>
+    </div>
+
+    <div id="status" class="status">
+        Search for your village or use your location to view weather.
+    </div>
+
+    <div id="weatherContent" style="display:none">
+
+        <div class="location" id="locationName"></div>
+
+        <div class="current-weather">
+            <div class="weather-icon" id="weatherIcon">🌤️</div>
+            <h2 id="weatherDescription">Weather</h2>
+            <div class="temperature" id="temperature">--°C</div>
+            <p id="feelsLike">Feels like --°C</p>
+        </div>
+
+        <div class="weather-grid">
+
+            <div class="weather-card">
+                <h3>💧 Humidity</h3>
+                <p id="humidity">--%</p>
+            </div>
+
+            <div class="weather-card">
+                <h3>🌧️ Rain</h3>
+                <p id="rain">-- mm</p>
+            </div>
+
+            <div class="weather-card">
+                <h3>🌬️ Wind Speed</h3>
+                <p id="wind">-- km/h</p>
+            </div>
+
+            <div class="weather-card">
+                <h3>☁️ Cloud Cover</h3>
+                <p id="clouds">--%</p>
+            </div>
+
+        </div>
+
+        <h2 class="section-title">📅 5-Day Weather Forecast</h2>
+
+        <div class="forecast-grid" id="forecast"></div>
+
+        <h2 class="section-title">🌱 Smart Farming Alerts</h2>
+
+        <div id="alerts"></div>
+
+    </div>
+</div>
+
+<footer>
+    © 2026 Crop Disease Reporting & Farm Advisory System
+</footer>
+
+<script>
+
+const statusDiv = document.getElementById("status");
+const weatherContent = document.getElementById("weatherContent");
+
+function weatherInfo(code) {
+
+    if (code === 0)
+        return ["☀️", "Clear Sky"];
+
+    if ([1, 2, 3].includes(code))
+        return ["🌤️", "Partly Cloudy"];
+
+    if ([45, 48].includes(code))
+        return ["🌫️", "Fog"];
+
+    if ([51, 53, 55, 56, 57].includes(code))
+        return ["🌦️", "Drizzle"];
+
+    if ([61, 63, 65, 66, 67].includes(code))
+        return ["🌧️", "Rain"];
+
+    if ([71, 73, 75, 77].includes(code))
+        return ["❄️", "Snow"];
+
+    if ([80, 81, 82].includes(code))
+        return ["🌧️", "Rain Showers"];
+
+    if ([85, 86].includes(code))
+        return ["🌨️", "Snow Showers"];
+
+    if ([95, 96, 99].includes(code))
+        return ["⛈️", "Thunderstorm"];
+
+    return ["🌥️", "Unknown Weather"];
+}
+
+
+// Search village/city using Geocoding API
+async function searchWeather() {
+
+    const city = document.getElementById("cityInput").value.trim();
+
+    if (!city) {
+        alert("Please enter a village, town or city.");
+        return;
+    }
+
+    statusDiv.textContent = "Searching location...";
+    weatherContent.style.display = "none";
+
+    try {
+
+        const geoURL =
+            "https://geocoding-api.open-meteo.com/v1/search?name=" +
+            encodeURIComponent(city) +
+            "&count=5&language=en&format=json";
+
+        const geoResponse = await fetch(geoURL);
+
+        if (!geoResponse.ok)
+            throw new Error("Location search failed.");
+
+        const geoData = await geoResponse.json();
+
+        if (!geoData.results || geoData.results.length === 0) {
+            statusDiv.textContent = "Location not found. Try another name.";
+            return;
+        }
+
+        const place = geoData.results[0];
+
+        await loadWeather(
+            place.latitude,
+            place.longitude,
+            place.name,
+            place.admin1 || "",
+            place.country || ""
+        );
+
+    } catch (error) {
+
+        statusDiv.textContent =
+            "Unable to get weather. Check your internet connection and try again.";
+
+        console.error(error);
+    }
+}
+
+
+// Get user's current location
+function getMyLocation() {
+
+    if (!navigator.geolocation) {
+        statusDiv.textContent = "Location is not supported by your browser.";
+        return;
+    }
+
+    statusDiv.textContent = "Getting your location...";
+
+    navigator.geolocation.getCurrentPosition(
+
+        async function(position) {
+
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            await loadWeather(
+                latitude,
+                longitude,
+                "Your Current Location",
+                "",
+                ""
+            );
+        },
+
+        function(error) {
+
+            statusDiv.textContent =
+                "Location access denied. Please search for your village or city.";
+        }
+    );
+}
+
+
+// Fetch current weather and forecast
+async function loadWeather(latitude, longitude, name, region, country) {
+
+    statusDiv.textContent = "Loading weather information...";
+    weatherContent.style.display = "none";
+
+    try {
+
+        const url =
+            "https://api.open-meteo.com/v1/forecast" +
+            "?latitude=" + latitude +
+            "&longitude=" + longitude +
+            "&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,wind_speed_10m,cloud_cover,weather_code" +
+            "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum" +
+            "&forecast_days=5" +
+            "&timezone=auto";
+
+        const response = await fetch(url);
+
+        if (!response.ok)
+            throw new Error("Weather API failed.");
+
+        const data = await response.json();
+
+        displayWeather(data, name, region, country);
+
+        weatherContent.style.display = "block";
+        statusDiv.textContent = "Weather updated successfully.";
+
+    } catch (error) {
+
+        statusDiv.textContent =
+            "Unable to load weather. Please try again.";
+
+        console.error(error);
+    }
+}
+
+
+// Display current weather
+function displayWeather(data, name, region, country) {
+
+    const current = data.current;
+
+    const info = weatherInfo(current.weather_code);
+
+    document.getElementById("locationName").textContent =
+        "📍 " + name +
+        (region ? ", " + region : "") +
+        (country ? ", " + country : "");
+
+    document.getElementById("weatherIcon").textContent = info[0];
+
+    document.getElementById("weatherDescription").textContent = info[1];
+
+    document.getElementById("temperature").textContent =
+        current.temperature_2m + "°C";
+
+    document.getElementById("feelsLike").textContent =
+        "Feels like " + current.apparent_temperature + "°C";
+
+    document.getElementById("humidity").textContent =
+        current.relative_humidity_2m + "%";
+
+    document.getElementById("rain").textContent =
+        current.precipitation + " mm";
+
+    document.getElementById("wind").textContent =
+        current.wind_speed_10m + " km/h";
+
+    document.getElementById("clouds").textContent =
+        current.cloud_cover + "%";
+
+    displayForecast(data.daily);
+
+    generateAlerts(data);
+}
+
+
+// Display 5-day forecast
+function displayForecast(daily) {
+
+    const forecastDiv = document.getElementById("forecast");
+
+    forecastDiv.innerHTML = "";
+
+    for (let i = 0; i < daily.time.length; i++) {
+
+        const info = weatherInfo(daily.weather_code[i]);
+
+        const date = new Date(daily.time[i] + "T00:00:00");
+
+        const day = date.toLocaleDateString("en-IN", {
+            weekday: "short",
+            day: "numeric",
+            month: "short"
+        });
+
+        const card = document.createElement("div");
+
+        card.className = "forecast-card";
+
+        card.innerHTML = `
+            <h3>${day}</h3>
+            <div class="forecast-icon">${info[0]}</div>
+            <p>${info[1]}</p>
+            <p>⬆️ ${daily.temperature_2m_max[i]}°C</p>
+            <p>⬇️ ${daily.temperature_2m_min[i]}°C</p>
+            <p>🌧️ Rain chance: ${daily.precipitation_probability_max[i] ?? "N/A"}%</p>
+            <p>🌧️ Rain: ${daily.precipitation_sum[i]} mm</p>
+        `;
+
+        forecastDiv.appendChild(card);
+    }
+}
+
+
+// Generate farming alerts from weather conditions
+function generateAlerts(data) {
+
+    const alertsDiv = document.getElementById("alerts");
+
+    alertsDiv.innerHTML = "";
+
+    const current = data.current;
+    const daily = data.daily;
+
+    const alerts = [];
+
+    // High humidity alert
+    if (current.relative_humidity_2m >= 80) {
+
+        alerts.push({
+            type: "warning",
+            title: "💧 High Humidity Alert",
+            message:
+                "Humidity is high. Monitor crops regularly for fungal diseases and leaf infections."
+        });
+    }
+
+    // Heavy rainfall alert
+    if (current.precipitation >= 10) {
+
+        alerts.push({
+            type: "danger",
+            title: "🌧️ Heavy Rain Alert",
+            message:
+                "Heavy rainfall is occurring. Check field drainage and avoid entering waterlogged fields."
+        });
+    }
+
+    // High temperature alert
+    if (current.temperature_2m >= 35) {
+
+        alerts.push({
+            type: "warning",
+            title: "🌡️ High Temperature Alert",
+            message:
+                "High temperature detected. Check soil moisture and monitor crops for heat stress."
+        });
+    }
+
+    // Strong wind alert
+    if (current.wind_speed_10m >= 30) {
+
+        alerts.push({
+            type: "warning",
+            title: "🌬️ Strong Wind Alert",
+            message:
+                "Strong winds are present. Protect young plants and avoid spraying during windy conditions."
+        });
+    }
+
+    // Forecast rain alert
+    if (daily.precipitation_probability_max[0] >= 70) {
+
+        alerts.push({
+            type: "info",
+            title: "🌦️ Rain Forecast",
+            message:
+                "Rain is likely today. Consider postponing irrigation and plan field activities accordingly."
+        });
+    }
+
+    // If no alerts
+    if (alerts.length === 0) {
+
+        alerts.push({
+            type: "info",
+            title: "✅ Weather Conditions Look Normal",
+            message:
+                "No major weather warning based on the current rules. Continue monitoring your crops regularly."
+        });
+    }
+
+    alerts.forEach(alert => {
+
+        const box = document.createElement("div");
+
+        box.className = "alert-box " + alert.type;
+
+        const title = document.createElement("h3");
+        title.textContent = alert.title;
+
+        const message = document.createElement("p");
+        message.textContent = alert.message;
+
+        box.appendChild(title);
+        box.appendChild(message);
+
+        alertsDiv.appendChild(box);
+    });
+}
+
+
+// Enter key triggers search
+document.getElementById("cityInput").addEventListener("keydown", function(event) {
+
+    if (event.key === "Enter") {
+        searchWeather();
+    }
+
+});
+
+</script>
+
+</body>
+</html>

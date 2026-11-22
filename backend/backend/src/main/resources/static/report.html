@@ -2,206 +2,416 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crop Disease Reporting</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crop Disease Reporting</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+<style>
+* {
+    box-sizing: border-box;
+}
 
-        body {
-            font-family: Arial, sans-serif;
-            background: #f0f8f0;
-            margin: 0;
-            padding: 20px;
-        }
+body {
+    font-family: Arial, sans-serif;
+    background: #f0f8f0;
+    margin: 0;
+    padding: 20px;
+}
 
-        .container {
-            max-width: 600px;
-            margin: 30px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 3px 12px #ccc;
-        }
+.container {
+    max-width: 600px;
+    margin: 30px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px #ccc;
+}
 
-        h2 {
-            text-align: center;
-            color: #237a35;
-        }
+h2 {
+    text-align: center;
+    color: #237a35;
+}
 
-        label {
-            display: block;
-            margin-top: 15px;
-            font-weight: bold;
-        }
+label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+}
 
-        input, select, textarea {
-            width: 100%;
-            padding: 11px;
-            margin-top: 7px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
+input, select, textarea {
+    width: 100%;
+    padding: 11px;
+    margin-top: 7px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
 
-        textarea {
-            height: 100px;
-            resize: vertical;
-        }
+textarea {
+    height: 100px;
+    resize: vertical;
+}
 
-        button {
-            width: 100%;
-            padding: 13px;
-            margin-top: 22px;
-            background: #238b38;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-        }
+button {
+    width: 100%;
+    padding: 13px;
+    margin-top: 22px;
+    background: #238b38;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
 
-        button:disabled {
-            background: gray;
-        }
+button:disabled {
+    background: gray;
+    cursor: not-allowed;
+}
 
-        #message {
-            text-align: center;
-            margin-top: 15px;
-            font-weight: bold;
-        }
+#message {
+    text-align: center;
+    margin-top: 15px;
+    font-weight: bold;
+}
 
-        .back {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            color: #237a35;
-        }
-    </style>
+#aiResult {
+    display: none;
+    margin-top: 20px;
+    padding: 18px;
+    border-radius: 8px;
+    background: #e8f5e9;
+    border-left: 5px solid #238b38;
+}
+
+#preview {
+    display: none;
+    width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    margin-top: 15px;
+    border-radius: 8px;
+}
+
+.back {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    color: #237a35;
+}
+</style>
 </head>
 
 <body>
 
 <div class="container">
 
-    <h2>Crop Disease Reporting</h2>
+<h2>Crop Disease Reporting</h2>
 
-    <form id="reportForm">
+<form id="reportForm">
 
-        <label>Farmer Name</label>
-        <input type="text" id="farmerName" value="Farmer" required>
+<label>Farmer Name</label>
+<input type="text" id="farmerName" value="Farmer" required>
 
-        <label>Crop Name</label>
-        <input type="text" id="cropName"
-               placeholder="Enter crop name" required>
+<label>Crop Name</label>
+<input type="text" id="cropName" placeholder="Enter crop name" required>
 
-        <label>Crop Type</label>
-        <select id="cropType" required>
-            <option value="">Select Crop Type</option>
-            <option value="Food Crop">Food Crop</option>
-            <option value="Cash Crop">Cash Crop</option>
-            <option value="Vegetable">Vegetable</option>
-            <option value="Fruit">Fruit</option>
-            <option value="Other">Other</option>
-        </select>
+<label>Crop Type</label>
+<select id="cropType" required>
+    <option value="">Select Crop Type</option>
+    <option value="Food Crop">Food Crop</option>
+    <option value="Cash Crop">Cash Crop</option>
+    <option value="Vegetable">Vegetable</option>
+    <option value="Fruit">Fruit</option>
+    <option value="Other">Other</option>
+</select>
 
-        <label>Symptoms</label>
-        <textarea id="symptoms"
-                  placeholder="Describe crop disease symptoms"
-                  required></textarea>
+<label>Symptoms</label>
+<textarea id="symptoms" placeholder="Describe crop disease symptoms" required></textarea>
 
-        <label>Village</label>
-        <input type="text" id="village" required>
+<label>Village</label>
+<input type="text" id="village" required>
 
-        <label>District</label>
-        <input type="text" id="district" required>
+<label>District</label>
+<input type="text" id="district" required>
 
-        <label>Upload Crop Image</label>
-        <input type="file" id="cropImage"
-               accept="image/*" required>
+<label>Upload Crop Image</label>
+<input type="file" id="cropImage" accept="image/*" required>
 
-        <button type="submit">Submit Report</button>
+<img id="preview" alt="Uploaded crop image">
 
-    </form>
+<!-- AI RESULT AFTER IMAGE UPLOAD -->
+<div id="aiResult">
+    <h3>🤖 AI Disease Prediction</h3>
 
-    <p id="message"></p>
+    <p>
+        <strong>Disease:</strong>
+        <span id="diseaseName"></span>
+    </p>
 
-    <a class="back" href="/dashboard.html">
-        Back to Dashboard
-    </a>
+    <p>
+        <strong>Confidence:</strong>
+        <span id="confidence"></span>
+    </p>
+
+    <p id="aiNote"></p>
+</div>
+
+<button type="submit" id="submitBtn">Submit Report</button>
+
+</form>
+
+<p id="message"></p>
+
+<a class="back" href="/dashboard.html">Back to Dashboard</a>
 
 </div>
 
 <script>
-document.getElementById("reportForm")
-    .addEventListener("submit", async function(event) {
 
-        event.preventDefault();
+const reportForm = document.getElementById("reportForm");
+const cropImage = document.getElementById("cropImage");
+const preview = document.getElementById("preview");
 
-        const button = this.querySelector("button");
-        const message = document.getElementById("message");
-        const image = document.getElementById("cropImage").files[0];
+const aiResult = document.getElementById("aiResult");
+const diseaseName = document.getElementById("diseaseName");
+const confidence = document.getElementById("confidence");
+const aiNote = document.getElementById("aiNote");
 
-        if (!image) {
-            alert("Please upload a crop image!");
+const message = document.getElementById("message");
+const submitBtn = document.getElementById("submitBtn");
+
+let previewURL = null;
+
+// Store AI detection result
+let detectedDisease = "";
+let detectedConfidence = 0;
+let detectionComplete = false;
+
+// Prevent older image detection from overwriting newer image result
+let detectionRequestId = 0;
+
+
+// IMAGE UPLOAD + PREVIEW + AUTOMATIC AI DETECTION
+cropImage.addEventListener("change", async function () {
+
+    const image = this.files[0];
+
+    // Reset previous AI result
+    aiResult.style.display = "none";
+    diseaseName.textContent = "";
+    confidence.textContent = "";
+    aiNote.textContent = "";
+    message.textContent = "";
+
+    detectedDisease = "";
+    detectedConfidence = 0;
+    detectionComplete = false;
+
+    // Create a new request ID
+    const currentRequestId = ++detectionRequestId;
+
+    if (previewURL) {
+        URL.revokeObjectURL(previewURL);
+        previewURL = null;
+    }
+
+    if (!image) {
+        preview.style.display = "none";
+        preview.removeAttribute("src");
+        return;
+    }
+
+    // Display uploaded image
+    previewURL = URL.createObjectURL(image);
+    preview.src = previewURL;
+    preview.style.display = "block";
+
+    // START AI DETECTION IMMEDIATELY AFTER IMAGE UPLOAD
+    message.style.color = "blue";
+    message.textContent = "🤖 AI is analyzing your crop image... Please wait.";
+
+    try {
+
+        const aiFormData = new FormData();
+        aiFormData.append("image", image);
+
+        const aiResponse = await fetch(
+            "/api/detection/predict",
+            {
+                method: "POST",
+                body: aiFormData
+            }
+        );
+
+        const aiData = await aiResponse.json();
+
+        if (!aiResponse.ok) {
+            throw new Error(
+                aiData.message || "AI disease detection failed."
+            );
+        }
+
+        if (!aiData.disease) {
+            throw new Error("AI did not return a disease name.");
+        }
+
+        // Ignore result if user uploaded another image meanwhile
+        if (currentRequestId !== detectionRequestId) {
             return;
         }
 
-        const formData = new FormData();
+        // Store AI result for later report submission
+        detectedDisease = aiData.disease;
+        detectedConfidence = Number(aiData.confidence);
+        detectionComplete = true;
 
-        formData.append("farmerName",
+        // Display disease name immediately
+        diseaseName.textContent = detectedDisease
+            .replaceAll("___", " - ")
+            .replaceAll("_", " ");
+
+        confidence.textContent =
+            Number.isFinite(detectedConfidence)
+                ? detectedConfidence.toFixed(2) + "%"
+                : "Not available";
+
+        aiNote.textContent =
+            "AI analysis completed. Please verify this prediction with an agricultural expert.";
+
+        aiResult.style.display = "block";
+
+        message.style.color = "green";
+        message.textContent =
+            "Disease detected successfully! You can now fill in the details and submit your report.";
+
+    } catch (error) {
+
+        // Ignore errors from an older image request
+        if (currentRequestId !== detectionRequestId) {
+            return;
+        }
+
+        detectionComplete = false;
+
+        message.style.color = "red";
+        message.textContent =
+            error.message || "Unable to detect disease. Please upload again.";
+
+    }
+
+});
+
+
+// SUBMIT REPORT USING THE ALREADY DETECTED DISEASE
+reportForm.addEventListener("submit", async function (event) {
+
+    event.preventDefault();
+
+    const image = cropImage.files[0];
+
+    if (!image) {
+        alert("Please upload a crop image!");
+        return;
+    }
+
+    // AI detection must finish before report submission
+    if (!detectionComplete || !detectedDisease) {
+        message.style.color = "red";
+        message.textContent =
+            "Please wait for AI disease detection to complete before submitting.";
+        return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting Report...";
+
+    message.style.color = "blue";
+    message.textContent = "Submitting your crop report...";
+
+    try {
+
+        // NO SECOND AI REQUEST
+        // Use the disease detected immediately after image upload
+
+        const reportData = new FormData();
+
+        reportData.append("farmerName",
             document.getElementById("farmerName").value);
 
-        formData.append("cropName",
+        reportData.append("cropName",
             document.getElementById("cropName").value);
 
-        formData.append("cropType",
+        reportData.append("cropType",
             document.getElementById("cropType").value);
 
-        formData.append("symptoms",
+        reportData.append("symptoms",
             document.getElementById("symptoms").value);
 
-        formData.append("village",
+        reportData.append("village",
             document.getElementById("village").value);
 
-        formData.append("district",
+        reportData.append("district",
             document.getElementById("district").value);
 
-        formData.append("image", image);
+        reportData.append("image", image);
 
-        button.disabled = true;
-        button.textContent = "Submitting...";
-        message.style.color = "blue";
-        message.textContent = "Submitting your report...";
+        reportData.append("detectedDisease", detectedDisease);
+        reportData.append("confidence", detectedConfidence);
 
-        try {
-            const response = await fetch("/api/reports/submit", {
+        // Submit report to backend
+        const reportResponse = await fetch(
+            "/api/reports/submit",
+            {
                 method: "POST",
-                body: formData
-            });
-
-            const result = await response.text();
-
-            if (response.ok) {
-                message.style.color = "green";
-                message.textContent = result;
-                document.getElementById("reportForm").reset();
-            } else {
-                message.style.color = "red";
-                message.textContent = result;
+                body: reportData
             }
+        );
 
-        } catch (error) {
-            message.style.color = "red";
-            message.textContent =
-                "Unable to connect to the backend!";
-        } finally {
-            button.disabled = false;
-            button.textContent = "Submit Report";
+        const reportText = await reportResponse.text();
+
+        if (!reportResponse.ok) {
+            throw new Error(reportText || "Report submission failed.");
         }
-    });
+
+        // Report successfully submitted
+        message.style.color = "green";
+        message.textContent =
+            "Report submitted successfully! Disease: " +
+            detectedDisease.replaceAll("_", " ").replaceAll("___", " - ");
+
+        // Reset form after successful submission
+        reportForm.reset();
+
+        preview.style.display = "none";
+        preview.removeAttribute("src");
+
+        aiResult.style.display = "none";
+
+        if (previewURL) {
+            URL.revokeObjectURL(previewURL);
+            previewURL = null;
+        }
+
+        // Clear stored detection
+        detectedDisease = "";
+        detectedConfidence = 0;
+        detectionComplete = false;
+
+    } catch (error) {
+
+        message.style.color = "red";
+        message.textContent =
+            error.message || "Unable to submit report.";
+
+    } finally {
+
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit Report";
+
+    }
+
+});
+
 </script>
 
 </body>
