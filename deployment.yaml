@@ -1,0 +1,21 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crop-disease-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crop-disease
+  template:
+    metadata:
+      labels:
+        app: crop-disease
+    spec:
+      containers:
+        - name: crop-disease-container
+          image: 325103282153/crop-disease-app:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8082
